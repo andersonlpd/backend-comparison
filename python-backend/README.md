@@ -235,9 +235,3 @@ Views para gerenciamento de tarefas:
 
 - `CSVUploadView`: Endpoint para upload de arquivos CSV
 - `TaskStatusView`: Endpoint para verificação de status de tarefas
-
-## Conclusão
-
-Este projeto demonstra a implementação de uma API robusta usando Django/DRF com processamento assíncrono via Celery/Redis. A arquitetura escolhida permite escalabilidade, observabilidade e manutenção simplificada, sendo ideal para aplicações que necessitam processar dados em background sem comprometer a performance da interface principal.
-
-Para contribuições ou dúvidas, consulte a documentação dos componentes utilizados ou abra uma issue no repositório do projeto.

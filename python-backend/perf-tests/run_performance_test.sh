@@ -5,8 +5,8 @@
 
 # Definir variáveis
 JMETER_PATH="jmeter"  # Altere para o caminho completo se necessário
-TEST_PLAN="/home/adorigao/projetos/backend-comparison/python-backend/python_api_performance_test.jmx"
-RESULTS_FOLDER="/home/adorigao/projetos/backend-comparison/python-backend/performance_results"
+TEST_PLAN="./python_api_performance_test.jmx"
+RESULTS_FOLDER="./performance_results"
 DATE=$(date +"%Y-%m-%d_%H-%M-%S")
 
 # Criar pasta para resultados se não existir

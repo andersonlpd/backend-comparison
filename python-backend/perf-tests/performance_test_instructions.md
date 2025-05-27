@@ -17,7 +17,7 @@
 
 1. Certifique-se de que sua aplicação está em execução:
    ```bash
-   cd /home/adorigao/projetos/backend-comparison/python-backend
+   cd ./backend-comparison/python-backend
    docker-compose up -d
    ```
 
