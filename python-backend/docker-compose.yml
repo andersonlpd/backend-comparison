@@ -1,0 +1,46 @@
+version: '3'
+services:
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    volumes:
+      - ./app:/python-backend/app
+    stdin_open: true
+    tty: true          
+    ports:
+    - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DB_HOST: postgres
+      JWT_SECRET_KEY: "i__5-guHJSsq8j3gz7SMWM6endwtqvvVWenfY40ghABKlIJ3J-hnybzAjNkSF2e19Dc"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+
+  celery:
+    build: .
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./app:/python-backend/app
+    depends_on:
+      - redis
+      - postgres
+      - app
+    environment:
+      DB_HOST: postgres
+      JWT_SECRET_KEY: "i__5-guHJSsq8j3gz7SMWM6endwtqvvVWenfY40ghABKlIJ3J-hnybzAjNkSF2e19Dc"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
