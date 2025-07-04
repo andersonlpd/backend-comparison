@@ -1,5 +1,8 @@
 from typing import Any, List
 import logging
+from prometheus_client import Histogram
+import time
+from app.core.metrics import DB_QUERY_DURATION
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
@@ -23,7 +26,10 @@ def read_products(
     """
     Retrieve products.
     """
+    start_time = time.time()
     products = db.query(Product).offset(skip).limit(limit).all()
+    duration = time.time() - start_time
+    DB_QUERY_DURATION.labels(operation='select').observe(duration)
     return products
 
 
@@ -51,9 +57,14 @@ async def create_product(
             sku=product_in.sku,
             owner_id=current_user.id,
         )
+        
+        start_time = time.time()
         db.add(product)
         db.commit()
         db.refresh(product)
+        duration = time.time() - start_time
+        DB_QUERY_DURATION.labels(operation='insert').observe(duration)
+        
         return product
     except Exception as e:
         logger.error(f"Error creating product: {str(e)}")
@@ -112,6 +123,12 @@ def delete_product(
     Delete a product.
     """
     product = db.query(Product).filter(Product.id == id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    db.delete(product)
+    db.commit()
+    return product
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     

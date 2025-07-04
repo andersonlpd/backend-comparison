@@ -1,4 +1,6 @@
 from typing import Generator
+import time
+from app.core.metrics import DB_QUERY_DURATION
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -8,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core import security
 from app.core.config import settings
-from app.db.database import get_db
+from app.db.database import get_db as database_get_db, SessionLocal
 from app.db.models import User
 from app.schemas.user import TokenPayload
 
@@ -16,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login
 
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+    db: Session = Depends(database_get_db), token: str = Depends(oauth2_scheme)
 ) -> User:
     try:
         payload = jwt.decode(
@@ -40,3 +42,6 @@ def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+# Use the existing get_db function from database module
+get_db = database_get_db

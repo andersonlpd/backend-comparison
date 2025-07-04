@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import time
+from app.core.metrics import DB_QUERY_DURATION
 
 from app.core.config import settings
 
@@ -16,4 +18,8 @@ def get_db():
     try:
         yield db
     finally:
+        # Medir tempo de commit/rollback
+        start_time = time.time()
         db.close()
+        duration = time.time() - start_time
+        DB_QUERY_DURATION.labels(operation='close').observe(duration)
