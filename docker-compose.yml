@@ -37,6 +37,8 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
 
   grafana:
@@ -49,10 +51,24 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PROVISIONING_PATH=/etc/grafana/provisioning
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
+    restart: always
+    
+  node-backend:
+    build:
+      context: ./node-backend
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/inventory
+      - SECRET_KEY=your_secret_key_here
+      - NODE_ENV=development
+    depends_on:
+      - db
     restart: always
 
 volumes:

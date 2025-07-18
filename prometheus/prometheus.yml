@@ -2,17 +2,28 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+rule_files:
+  # - "first_rules.yml"
+
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
   - job_name: 'python-backend'
-    scrape_interval: 5s
     static_configs:
       - targets: ['python-backend:8000']
-
-  - job_name: 'cadvisor'
+    metrics_path: '/metrics'
     scrape_interval: 5s
+
+  - job_name: 'jmeter'
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ['host.docker.internal:9270']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'node-backend'
+    static_configs:
+      - targets: ['node-backend:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s

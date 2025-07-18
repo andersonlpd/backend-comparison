@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  jmeter-test:
+    build:
+      context: .
+    ports:
+      - "9270:9270"
+    depends_on:
+      - python-backend
+    networks:
+      - backend-comparison_default
+    environment:
+      - JMETER_ARGS=-Jprometheus.port=9270 -Jmetric.name=jmeter_test
+    command: >
+      sh -c "
+        echo 'Starting JMeter with Prometheus metrics...'
+        jmeter -n -t /tests/backend-test-plan.jmx -l /tmp/result.jtl &
+        echo 'JMeter started, keeping container alive for metrics collection...'
+        tail -f /dev/null
+      "
+
+networks:
+  backend-comparison_default:
+    external: true
