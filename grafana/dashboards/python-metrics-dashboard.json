@@ -541,7 +541,7 @@
       },
       "targets": [
         {
-          "expr": "app_cpu_usage_percent",
+          "expr": "rate(process_cpu_seconds_total{job=\"python-backend\"}[1m]) * 100",
           "interval": "",
           "legendFormat": "CPU Usage %",
           "refId": "A"
@@ -623,13 +623,13 @@
       },
       "targets": [
         {
-          "expr": "app_memory_usage_bytes",
+          "expr": "process_resident_memory_bytes{job=\"python-backend\"}",
           "interval": "",
-          "legendFormat": "Memory Usage",
+          "legendFormat": "Resident Memory",
           "refId": "A"
         },
         {
-          "expr": "app_heap_size_bytes",
+          "expr": "process_heap_bytes{job=\"python-backend\"}",
           "interval": "",
           "legendFormat": "Heap Size",
           "refId": "B"
