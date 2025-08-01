@@ -71,7 +71,22 @@ services:
       - db
     restart: always
 
+  influxdb:
+    image: influxdb:1.8-alpine
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=jmeter
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - INFLUXDB_USER=jmeter
+      - INFLUXDB_USER_PASSWORD=jmeter
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    restart: always
+
 volumes:
   postgres_data:
   prometheus_data:
   grafana_data:
+  influxdb_data:
