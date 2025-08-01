@@ -6,3 +6,15 @@ datasources:
     access: proxy
     url: http://prometheus:9090
     isDefault: true
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: jmeter
+    user: jmeter
+    password: jmeter
+    isDefault: false
+    editable: true
+    basicAuth: false
+    jsonData:
+      timeInterval: "5s"
