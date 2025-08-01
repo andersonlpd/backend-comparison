@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const promClient = require('prom-client');
 require('dotenv').config();
 
-const { sequelize } = require('./models');
+const { sequelize, setDbMetric } = require('./models');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const inventoryRoutes = require('./routes/inventory');
@@ -32,8 +32,19 @@ const httpRequestCount = new promClient.Counter({
   labelNames: ['method', 'endpoint', 'http_status']
 });
 
+const dbQueryDuration = new promClient.Histogram({
+  name: 'node_app_db_query_duration_seconds',
+  help: 'Duration of database queries in seconds',
+  labelNames: ['operation'],
+  buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+});
+
 register.registerMetric(httpRequestDuration);
 register.registerMetric(httpRequestCount);
+register.registerMetric(dbQueryDuration);
+
+// Set the database metric for use in hooks
+setDbMetric(dbQueryDuration);
 
 // Middleware
 app.use(helmet());

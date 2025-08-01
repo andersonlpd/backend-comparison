@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { sequelize, setDbMetric } = require('../config/database');
 
 // Import models
 const User = require('./User')(sequelize, DataTypes);
@@ -26,6 +26,7 @@ OrderItem.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
 
 module.exports = {
   sequelize,
+  setDbMetric,
   User,
   Product,
   InventoryItem,
