@@ -1,5 +1,5 @@
 const express = require('express');
-const { Product } = require('../models');
+const { Product, InventoryItem, OrderItem } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -77,7 +77,19 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    // Remove related order items first
+    await OrderItem.destroy({
+      where: { product_id: req.params.id }
+    });
+
+    // Remove related inventory items
+    await InventoryItem.destroy({
+      where: { product_id: req.params.id }
+    });
+
+    // Finally, delete the product
     await product.destroy();
+    
     res.json(product);
   } catch (error) {
     console.error('Delete product error:', error);

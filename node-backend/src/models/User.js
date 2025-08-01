@@ -13,9 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         isEmail: true
       }
     },
-    password: {
+    hashed_password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      field: 'hashed_password'
     },
     full_name: {
       type: DataTypes.STRING,
@@ -27,9 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'users',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    timestamps: false
   });
 
   return User;

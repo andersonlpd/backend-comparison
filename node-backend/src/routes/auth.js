@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
     // Create user
     const user = await User.create({
       email,
-      password: hashedPassword,
+      hashed_password: hashedPassword,
       full_name
     });
 
@@ -49,7 +49,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Check password
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.hashed_password);
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

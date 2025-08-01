@@ -3,7 +3,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const promClient = require('prom-client');
-const promMiddleware = require('express-prometheus-middleware');
 require('dotenv').config();
 
 const { sequelize } = require('./models');
@@ -105,8 +104,9 @@ async function startServer() {
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
     
-    await sequelize.sync();
-    console.log('Database synchronized.');
+    // Don't sync in production, just authenticate
+    // The tables already exist from Python backend
+    console.log('Using existing database structure.');
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
