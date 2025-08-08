@@ -1,0 +1,91 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: python-backend-config
+  namespace: backend-comparison
+data:
+  DATABASE_URL: "postgresql://postgres:postgres@postgres-service:5432/comparison_db"
+  SECRET_KEY: "your-secret-key-change-in-production"
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-backend
+  namespace: backend-comparison
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: python-backend
+  template:
+    metadata:
+      labels:
+        app: python-backend
+    spec:
+      containers:
+      - name: python-backend
+        image: backend-comparison/python-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: python-backend-config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-backend-service
+  namespace: backend-comparison
+  labels:
+    app: python-backend
+spec:
+  selector:
+    app: python-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-backend-nodeport
+  namespace: backend-comparison
+  labels:
+    app: python-backend
+spec:
+  selector:
+    app: python-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    nodePort: 30001
+  type: NodePort

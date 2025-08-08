@@ -1,0 +1,113 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: influxdb-pv
+  namespace: backend-comparison
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/k8s-influxdb-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-pvc
+  namespace: backend-comparison
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  namespace: backend-comparison
+data:
+  DOCKER_INFLUXDB_INIT_MODE: "setup"
+  DOCKER_INFLUXDB_INIT_USERNAME: "admin"
+  DOCKER_INFLUXDB_INIT_PASSWORD: "admin123"
+  DOCKER_INFLUXDB_INIT_ORG: "backend-comparison"
+  DOCKER_INFLUXDB_INIT_BUCKET: "jmeter"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  namespace: backend-comparison
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:2.7
+        ports:
+        - containerPort: 8086
+        envFrom:
+        - configMapRef:
+            name: influxdb-config
+        volumeMounts:
+        - name: influxdb-storage
+          mountPath: /var/lib/influxdb2
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: influxdb-storage
+        persistentVolumeClaim:
+          claimName: influxdb-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-service
+  namespace: backend-comparison
+  labels:
+    app: influxdb
+spec:
+  selector:
+    app: influxdb
+  ports:
+  - protocol: TCP
+    port: 8086
+    targetPort: 8086
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-nodeport
+  namespace: backend-comparison
+  labels:
+    app: influxdb
+spec:
+  selector:
+    app: influxdb
+  ports:
+  - protocol: TCP
+    port: 8086
+    targetPort: 8086
+    nodePort: 30004
+  type: NodePort
