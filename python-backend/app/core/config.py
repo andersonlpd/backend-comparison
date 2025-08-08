@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
+        # Check for DATABASE_URL environment variable first
+        import os
+        if os.getenv("DATABASE_URL"):
+            return os.getenv("DATABASE_URL")
         return PostgresDsn.build(
             scheme="postgresql",
             user=values.get("POSTGRES_USER"),
