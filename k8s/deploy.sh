@@ -29,6 +29,7 @@ kubectl wait --for=condition=Ready pod -l app=postgres -n backend-comparison --t
 echo "4️⃣ Deploying monitoring stack..."
 kubectl apply -f "${CURRENT_DIR}/monitoring/prometheus.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/node-exporter.yaml"
+kubectl apply -f "${CURRENT_DIR}/monitoring/cadvisor.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/influxdb.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/grafana.yaml"
 
@@ -45,7 +46,14 @@ echo "7️⃣ Aguardando backends estarem prontos..."
 kubectl wait --for=condition=Ready pod -l app=python-backend -n backend-comparison --timeout=300s
 kubectl wait --for=condition=Ready pod -l app=node-backend -n backend-comparison --timeout=300s
 
+echo "8️⃣ Configurando InfluxDB para JMeter..."
+# Executar script de configuração do InfluxDB
+"${CURRENT_DIR}/configure-influxdb.sh"
+
 echo "✅ Deploy concluído com sucesso!"
+echo ""
+echo "🔍 Validando ambiente..."
+"${CURRENT_DIR}/validate.sh"
 echo ""
 echo "🎯 Verificando status dos pods..."
 kubectl get pods -n backend-comparison
