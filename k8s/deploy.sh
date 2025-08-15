@@ -20,31 +20,28 @@ kubectl cluster-info --context kind-${CLUSTER_NAME}
 echo "1️⃣ Criando namespace..."
 kubectl apply -f "${CURRENT_DIR}/namespace/namespace.yaml"
 
-echo "2️⃣ Aguardando namespace estar ativo..."
-kubectl wait --for=condition=Active namespace/backend-comparison --timeout=60s
-
-echo "3️⃣ Deploying banco de dados PostgreSQL..."
+echo "2️⃣ Deploying banco de dados PostgreSQL..."
 kubectl apply -f "${CURRENT_DIR}/database/postgres.yaml"
 
-echo "4️⃣ Aguardando PostgreSQL estar pronto..."
+echo "3️⃣ Aguardando PostgreSQL estar pronto..."
 kubectl wait --for=condition=Ready pod -l app=postgres -n backend-comparison --timeout=300s
 
-echo "5️⃣ Deploying monitoring stack..."
+echo "4️⃣ Deploying monitoring stack..."
 kubectl apply -f "${CURRENT_DIR}/monitoring/prometheus.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/node-exporter.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/influxdb.yaml"
 kubectl apply -f "${CURRENT_DIR}/monitoring/grafana.yaml"
 
-echo "6️⃣ Aguardando serviços de monitoramento estarem prontos..."
+echo "5️⃣ Aguardando serviços de monitoramento estarem prontos..."
 kubectl wait --for=condition=Ready pod -l app=prometheus -n backend-comparison --timeout=300s
 kubectl wait --for=condition=Ready pod -l app=influxdb -n backend-comparison --timeout=300s
 kubectl wait --for=condition=Ready pod -l app=grafana -n backend-comparison --timeout=300s
 
-echo "7️⃣ Deploying backends Python e Node.js..."
+echo "6️⃣ Deploying backends Python e Node.js..."
 kubectl apply -f "${CURRENT_DIR}/backends/python-backend.yaml"
 kubectl apply -f "${CURRENT_DIR}/backends/node-backend.yaml"
 
-echo "8️⃣ Aguardando backends estarem prontos..."
+echo "7️⃣ Aguardando backends estarem prontos..."
 kubectl wait --for=condition=Ready pod -l app=python-backend -n backend-comparison --timeout=300s
 kubectl wait --for=condition=Ready pod -l app=node-backend -n backend-comparison --timeout=300s
 

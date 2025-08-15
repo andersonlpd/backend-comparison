@@ -37,6 +37,7 @@ data:
   DOCKER_INFLUXDB_INIT_PASSWORD: "admin123"
   DOCKER_INFLUXDB_INIT_ORG: "backend-comparison"
   DOCKER_INFLUXDB_INIT_BUCKET: "jmeter"
+  DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "my-super-secret-auth-token"
 
 ---
 apiVersion: apps/v1
