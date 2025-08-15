@@ -2,6 +2,11 @@
 
 Este projeto contém uma comparação completa de performance entre duas implementações de uma API REST de gerenciamento de inventário: uma em Python (FastAPI) e outra em Node.js (Express). O projeto inclui monitoramento completo com Prometheus, Grafana e InfluxDB, além de testes de carga automatizados com JMeter.
 
+## 🚀 Ambientes de Deploy Disponíveis
+
+- **Docker Compose** - Ambiente local completo com todos os serviços
+- **Kubernetes (Kind)** - Deploy em cluster Kubernetes local para testes mais realistas
+
 ## Estrutura do Projeto
 
 ```
@@ -53,6 +58,19 @@ backend-comparison/
 │   ├── package.json
 │   ├── Dockerfile
 │   └── .env
+├── k8s/                           # Deploy Kubernetes
+│   ├── kind-config.yaml           # Configuração cluster Kind
+│   ├── setup-kind.sh              # Setup cluster
+│   ├── deploy.sh                  # Deploy aplicações
+│   ├── run-tests.sh               # Execução de testes
+│   ├── monitor.sh                 # Monitoramento
+│   ├── cleanup.sh                 # Limpeza ambiente
+│   ├── namespace/                 # Namespace manifests
+│   ├── database/                  # PostgreSQL manifests  
+│   ├── backends/                  # Python & Node.js manifests
+│   ├── monitoring/                # Prometheus, Grafana, InfluxDB
+│   ├── jmeter/                    # JMeter jobs
+│   └── README.md                  # Documentação Kubernetes
 ├── jmeter/                         # Testes de carga
 │   ├── backend-test-plan.jmx       # Teste original Python
 │   ├── node-test-plan.jmx          # Teste específico Node.js
@@ -109,6 +127,8 @@ backend-comparison/
 
 ## Como Executar
 
+### Opção 1: Docker Compose (Recomendado para desenvolvimento)
+
 1. Clone o repositório:
    ```bash
    git clone https://github.com/seu-usuario/backend-comparison.git
@@ -131,6 +151,51 @@ backend-comparison/
    - **Grafana**: http://localhost:3000 (admin/admin)
    - **Prometheus**: http://localhost:9090
    - **InfluxDB**: http://localhost:8086
+
+### Opção 2: Kubernetes com Kind (Recomendado para testes de performance)
+
+1. **Pré-requisitos**: Docker, Kind e kubectl instalados
+
+2. **Setup inicial**:
+   ```bash
+   cd k8s
+   ./setup-kind.sh
+   ```
+
+3. **Deploy das aplicações**:
+   ```bash
+   ./deploy.sh
+   ```
+
+4. **Executar testes de performance**:
+   ```bash
+   ./run-tests.sh  # Ambos backends
+   # ou
+   ./run-tests.sh python  # Apenas Python
+   ./run-tests.sh node    # Apenas Node.js
+   ```
+
+5. **Monitorar cluster**:
+   ```bash
+   ./monitor.sh  # Status geral
+   ./monitor.sh logs  # Com logs
+   ./monitor.sh watch  # Monitoramento contínuo
+   ```
+
+6. **Acesse os serviços**:
+   - **API Python**: http://localhost:30001
+   - **API Node.js**: http://localhost:30002
+   - **Prometheus**: http://localhost:30003
+   - **InfluxDB**: http://localhost:30004
+   - **Grafana**: http://localhost:30005 (admin/admin)
+
+> **💡 Vantagens do Kubernetes:**
+> - Isolamento mais realista entre aplicações
+> - Balanceamento de carga automático
+> - Monitoramento de recursos mais preciso
+> - Simulação de ambiente de produção
+
+**📚 Documentação completa do Kubernetes:** [k8s/README.md](k8s/README.md)
 
 ## Endpoints da API
 
