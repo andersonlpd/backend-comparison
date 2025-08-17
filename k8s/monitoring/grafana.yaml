@@ -4361,86 +4361,86 @@ data:
     }
 
 
-    ---
-    apiVersion: v1
-    kind: PersistentVolume
-    metadata:
-      name: grafana-pv
-      namespace: backend-comparison
-    spec:
-      capacity:
-        storage: 1Gi
-      accessModes:
-        - ReadWriteOnce
-      hostPath:
-        path: /tmp/k8s-grafana-data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-pv
+  namespace: backend-comparison
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/k8s-grafana-data
 
-    ---
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: grafana-pvc
-      namespace: backend-comparison
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: backend-comparison
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: backend-comparison
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
     metadata:
-      name: grafana
-      namespace: backend-comparison
+      labels:
+        app: grafana
     spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: grafana
-      template:
-        metadata:
-          labels:
-            app: grafana
-        spec:
-          containers:
-          - name: grafana
-            image: grafana/grafana:latest
-            ports:
-            - containerPort: 3000
-            env:
-            - name: GF_SECURITY_ADMIN_PASSWORD
-              value: "admin"
-            volumeMounts:
-            - name: grafana-storage
-              mountPath: /var/lib/grafana
-            - name: grafana-datasources
-              mountPath: /etc/grafana/provisioning/datasources
-            - name: grafana-dashboards-config
-              mountPath: /etc/grafana/provisioning/dashboards
-            - name: grafana-dashboards
-              mountPath: /etc/grafana/provisioning/dashboards/dashboards
-            resources:
-              requests:
-                memory: "256Mi"
-                cpu: "250m"
-              limits:
-                memory: "512Mi"
-                cpu: "500m"
-          volumes:
-          - name: grafana-storage
-            persistentVolumeClaim:
-              claimName: grafana-pvc
-          - name: grafana-datasources
-            configMap:
-              name: grafana-datasources
-          - name: grafana-dashboards-config
-            configMap:
-              name: grafana-dashboards-config
-          - name: grafana-dashboards
-            configMap:
-              name: grafana-dashboards
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "admin"
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: grafana-dashboards
+          mountPath: /etc/grafana/provisioning/dashboards/dashboards
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: grafana-pvc
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - name: grafana-dashboards-config
+        configMap:
+          name: grafana-dashboards-config
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
 
 ---
 apiVersion: v1

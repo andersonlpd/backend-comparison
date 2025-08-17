@@ -31,6 +31,11 @@ data:
         static_configs:
           - targets: ['node-exporter-service:9100']
 
+      - job_name: 'cadvisor'
+        static_configs:
+          - targets: ['cadvisor-service:8080']
+        scrape_interval: 10s
+
 ---
 apiVersion: v1
 kind: PersistentVolume
