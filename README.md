@@ -189,14 +189,6 @@ backend-comparison/
    - **InfluxDB**: http://localhost:30004
    - **Grafana**: http://localhost:30005 (admin/admin)
 
-> **💡 Vantagens do Kubernetes:**
-> - Isolamento mais realista entre aplicações
-> - Balanceamento de carga automático
-> - Monitoramento de recursos mais preciso
-> - Simulação de ambiente de produção
-
-**📚 Documentação completa do Kubernetes:** [k8s/README.md](k8s/README.md)
-
 ## Endpoints da API
 
 Ambas as APIs implementam os mesmos endpoints para comparação direta:
@@ -235,19 +227,15 @@ Ambas as APIs implementam os mesmos endpoints para comparação direta:
 2. **Testes individuais com Prometheus**:
    ```bash
    # Python
-   chmod +x scripts/run-jmeter-tests.sh
-   ./scripts/run-jmeter-tests.sh
+   ./scripts/run-jmeter-tests.sh python
    
    # Node.js
-   chmod +x scripts/run-node-jmeter-tests.sh
-   ./scripts/run-node-jmeter-tests.sh
+   ./scripts/run-jmeter-tests.sh node
    ```
 
 ### Configuração dos Testes
-- **Threads**: 10 usuários simultâneos
-- **Ramp-up**: 30 segundos
-- **Loops**: 100 iterações por usuário
-- **Total**: ~1000 requisições por backend
+- **Threads**: 20 usuários simultâneos
+- **Steps**: Ramp-up de 5 threads a cada 5 minutos
 
 ## Dashboards e Métricas
 
@@ -288,67 +276,3 @@ Ambas as APIs implementam os mesmos endpoints para comparação direta:
 - **Throughput**: requests/second
 - **Errors**: count e percentage
 - **Virtual users**: concurrent threads
-
-## Comparação de Performance
-
-### Pontos de Análise
-
-1. **Latência de Response Time**:
-   - Percentil 95 para diferentes endpoints
-   - Comportamento sob carga crescente
-
-2. **Throughput**:
-   - Requisições por segundo máximas
-   - Degradação com aumento de carga
-
-3. **Uso de Recursos**:
-   - CPU efficiency
-   - Memory footprint
-   - Database query performance
-
-4. **Características Específicas**:
-   - Python: GIL impact, blocking I/O
-   - Node.js: Event loop performance, garbage collection
-
-### Resultados Esperados
-
-**Python (FastAPI) - Pontos Fortes:**
-- Maior throughput para operações CPU-intensivas
-- Melhor para processamento de dados complexos
-- Documentação automática superior
-
-**Node.js (Express) - Pontos Fortes:**
-- Menor latência para I/O operations
-- Melhor para aplicações real-time
-- Menor memory footprint inicial
-
-## Troubleshooting
-
-### Problemas Comuns
-
-1. **Containers não iniciam**:
-   ```bash
-   docker-compose down
-   docker system prune -f
-   docker-compose up -d
-   ```
-
-2. **Métricas não aparecem no Grafana**:
-   - Verificar se datasources estão configurados
-   - Verificar conectividade: `docker-compose logs grafana`
-
-3. **JMeter connection errors**:
-   - Verificar se backends estão healthy
-   - Aguardar inicialização completa (~2 minutos)
-
-### Logs e Debug
-
-```bash
-# Ver logs de todos os serviços
-docker-compose logs -f
-
-# Logs específicos
-docker-compose logs python-backend
-docker-compose logs node-backend
-docker-compose logs grafana
-```
